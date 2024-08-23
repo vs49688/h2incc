@@ -3861,7 +3861,9 @@ int MacroInvocation(struct INCFILE* pIncFile, char* pszToken, struct ITEM_MACROI
             if (param_i < 0) {
                 strcat(buffer, currentContentToken);
             } else {
-                strcat(buffer, params[param_i]);
+                /* It's valid to have empty parameters. */
+                if(params[param_i] != NULL)
+                    strcat(buffer, params[param_i]);
             }
             nextAppend = 0;
         }
