@@ -1281,12 +1281,12 @@ void IsInclude(struct INCFILE* pIncFile) {
         incPathArg[pszPath - startIncPath] = '\0';
 
         char *newFullIncPath = NULL;
-        newFullIncPath = strings_join(pIncFile->pszDirPath, incPathArg, NULL);
+        newFullIncPath = strings_join(pIncFile->pszDirPath, "/", incPathArg, NULL);
         if (!file_exists(newFullIncPath)) {
             free(newFullIncPath);
             newFullIncPath = NULL;
             for (size_t i = 0; i < g_pszIncDirs->size; i++) {
-                newFullIncPath = strings_join(((const char**)g_pszIncDirs->data)[i], incPathArg, NULL);
+                newFullIncPath = strings_join(((const char**)g_pszIncDirs->data)[i], "/", incPathArg, NULL);
                 if (file_exists(newFullIncPath)) {
                     break;
                 }
