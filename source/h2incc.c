@@ -869,11 +869,12 @@ int ProcessFile(char* pszFileName, struct INCFILE* pParent) {
     // don't process files more than once
     struct StringLL *pCurrent = g_pInpFiles;
     while (pCurrent != NULL) {
-        pCurrent = pCurrent->next;
         if (strcasecmp(pCurrent->str, pszFileName) == 0) {
             return 0;
         }
+        pCurrent = pCurrent->next;
     }
+
     struct StringLL* pNew = malloc(sizeof(struct StringLL) + strlen(pszFileName) + 1);
     pNew->str = (char*)pNew + sizeof(struct StringLL);
     strcpy(pNew->str, pszFileName);
