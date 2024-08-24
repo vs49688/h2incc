@@ -397,12 +397,6 @@ char* InsertDefItem(struct INCFILE* pIncFile, char* pszFuncName, uint32_t dwParm
     return pos;
 }
 
-// write a string to output stream
-void xwrite(struct INCFILE* pIncFile, const char* pszText) {
-    strcpy(pIncFile->pszOut, pszText);
-    pIncFile->pszOut += strlen(pszText);
-}
-
 int IsNewLine(struct INCFILE* pIncFile) {
     if (pIncFile->pszOut == pIncFile->pszOutStart) {
         return 1;
@@ -416,6 +410,11 @@ void xprintf(struct INCFILE* pIncFile, const char* pszFormat, ...) {
     int nb = vsprintf(pIncFile->pszOut, pszFormat, args);
     va_end(args);
     pIncFile->pszOut += nb;
+}
+
+// write a string to output stream
+void xwrite(struct INCFILE* pIncFile, const char* pszText) {
+    xprintf(pIncFile, "%s", pszText);
 }
 
 int IsDelim(char c) {
