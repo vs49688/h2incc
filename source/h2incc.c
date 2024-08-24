@@ -858,6 +858,21 @@ static void InputFileNameToIncFileName(const char* inputFilePath, const char* ou
 }
 
 // process 1 header file
+static char *xbasename(const char *s)
+{
+    char *ss, *dot, *slash;
+
+    if((ss = strdup(s)) == NULL)
+        return NULL;
+
+    if((dot = strrchr(ss, '.')) != NULL)
+        *dot = '\0';
+
+    if((slash = strrchr(ss, '/')) != NULL)
+        memmove(ss, slash + 1, strlen(slash));
+
+    return ss;
+}
 
 int ProcessFile(char* pszFileName, struct INCFILE* pParent) {
     struct INCFILE* pIncFile;
@@ -891,8 +906,11 @@ int ProcessFile(char* pszFileName, struct INCFILE* pParent) {
     }
     InputFileNameToIncFileName(pszFileName, g_pszOutDir, szOutName);
     debug_printf("%s => '%s'\n", pszFileName, szOutName);
-    // _splitpath(szFileName, NULL, NULL, g_szName, g_szExt);
-    // _makepath(szOutName, NULL, g_pszOutDir, g_szName, ".INC");
+    {
+        char *base = xbasename(pszFileName);
+        sprintf(szOutName, "%s/%s.inc", g_pszOutDir, base);
+        free(base);
+    }
 
 #ifdef OVERWRITE_PROTECTION
     if (!CheckIncFile(szOutName, pszFileName, pParent)) {
