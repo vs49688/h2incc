@@ -1250,7 +1250,6 @@ int file_exists(const char *path) {
 void IsInclude(struct INCFILE* pIncFile) {
     char* pszPath;
 
-    xwrite(pIncFile, "\tinclude ");
     pszPath = GetNextTokenPP(pIncFile);
     if (pszPath != NULL && *pszPath == '<') {
         pszPath = GetNextTokenPP(pIncFile);
@@ -1279,6 +1278,16 @@ void IsInclude(struct INCFILE* pIncFile) {
         char *incPathArg = strdup(startIncPath);
         incPathArg[pszPath - startIncPath] = '\0';
 
+        xprintf(pIncFile, "\tinclude %s\r\n", incPathArg);
+
+        if(strcasecmp(pIncFile->pszOut - 4, ".h\r\n") == 0) {
+            pIncFile->pszOut -= 4;
+            xwrite(pIncFile, ".inc\r\n");
+        }
+
+        if(!g_bProcessInclude)
+            return;
+
         char *newFullIncPath = NULL;
         newFullIncPath = strings_join(pIncFile->pszDirPath, "/", incPathArg, NULL);
         if (!file_exists(newFullIncPath)) {
@@ -1293,30 +1302,22 @@ void IsInclude(struct INCFILE* pIncFile) {
                 newFullIncPath = NULL;
             }
         }
-        if (newFullIncPath) {
-            struct INCFILE *subIncFile = CreateIncFile(newFullIncPath, pIncFile);
-            free((char *) newFullIncPath);
-            if (subIncFile != NULL) {
-                ParserIncFile(subIncFile);
-                AnalyzerIncFile(subIncFile);
-                DestroyIncFile(subIncFile);
-            }
+
+        if(newFullIncPath == NULL) {
+            fprintf(stderr, "%s, %u: include file %s not found\n", pIncFile->pszFileName, pIncFile->dwLine, incPathArg  );
+            pIncFile->dwErrors++;
+            return;
         }
 
-        char ext[2];
-        memcpy(ext, &pszOut[-2], 2);
-        if (strnicmp(ext, ".h", 2) == 0) {
-            if (g_bProcessInclude) {
-                ProcessFile(pIncFile->pszOut, pIncFile);
-            }
-            strcpy(&pszOut[-2], ".inc");
-            pszOut += 2;
+        struct INCFILE *subIncFile = CreateIncFile(newFullIncPath, pIncFile);
+        if(subIncFile != NULL && g_bProcessInclude) {
+            ProcessFile(newFullIncPath, pIncFile);
+//            ParserIncFile(subIncFile);
+//            AnalyzerIncFile(subIncFile);
+//            DestroyIncFile(subIncFile);
         }
-        strcpy(pszOut, "\r\n");
-        pszOut += 2;
+        free((char *)newFullIncPath);
     }
-    pIncFile->pszOut = pszOut;
-    *pszOut = '\0';
 }
 
 void IsError(struct INCFILE* pIncFile) {
