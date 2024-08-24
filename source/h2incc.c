@@ -483,6 +483,13 @@ int getoption(char* pszArgument) {
                     return 1;
                 }
                 return 0;
+            } else if (pszArgument[1] == 'I') {
+                /* Handle "-I/path/to/dir" */
+                if (pszArgument[2] == '\0')
+                    return 1;
+
+                vector_charp_append(g_pszIncDirs, pszArgument + 2);
+                return 0;
             }
             return 1;
         } else {
