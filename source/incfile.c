@@ -1305,7 +1305,7 @@ void IsInclude(struct INCFILE* pIncFile) {
 
         if(newFullIncPath == NULL) {
             fprintf(stderr, "%s, %u: include file %s not found\n", pIncFile->pszFileName, pIncFile->dwLine, incPathArg  );
-            pIncFile->dwErrors++;
+//            pIncFile->dwErrors++;
             return;
         }
 
